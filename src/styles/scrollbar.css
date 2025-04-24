@@ -1,0 +1,64 @@
+/* Custom scrollbar styling */
+
+:root {
+    --scrollbar-color: rgba(98, 126, 234, 0.3);
+    --scrollbar-thumb-color: rgba(149, 189, 255, 0.4);
+    --scrollbar-thumb-hover-color: rgba(149, 189, 255, 0.6);
+    --scrollbar-thumb-glow: 0 0 8px rgba(149, 189, 255, 0.8);
+    --scrollbar-width: 4px;
+}
+
+
+/* Specific styling for elements with custom-scrollbar class */
+
+
+/* Scrollbar styling for Webkit browsers (Chrome, Safari, newer Edge)   */
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: var(--scrollbar-width);
+    height: var(--scrollbar-width);
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--scrollbar-color);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-color);
+    border-radius: 50px;
+    box-shadow: var(--scrollbar-thumb-glow);
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover-color);
+    box-shadow: 0 0 12px rgba(149, 189, 255, 0.9);
+}
+
+
+/* Scrollbar styling for Firefox */
+
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-color);
+}
+
+
+/* JavaScript will control the glow effect based on scroll speed */
+
+.custom-scrollbar.intense-scroll::-webkit-scrollbar-thumb {
+    box-shadow: 0 0 15px rgba(149, 189, 255, 1);
+}
+
+
+/* Make sure Tailwind's scrollbar-hide doesn't interfere */
+
+.custom-scrollbar {
+    scrollbar-width: thin !important;
+    -ms-overflow-style: auto !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    display: block !important;
+}
