@@ -152,10 +152,10 @@ const ParallaxScene = () => {
     <div
       ref={containerRef}
       className={cn(
-        "relative w-screen bg-[#141529]",
+        "relative w-screen min-h-screen bg-[#141529] z-10",
         isMobile 
-          ? "min-h-screen overflow-y-auto overflow-x-hidden px-4 pb-16" 
-          : "h-screen overflow-y-hidden overflow-x-hidden"
+          ? "overflow-y-auto overflow-x-hidden px-4 pb-16" 
+          : "overflow-y-hidden overflow-x-hidden"
       )}
     >
       {/* LAYER 1: Background elements */}
@@ -887,7 +887,7 @@ const ParallaxScene = () => {
                 <div className="flex items-center justify-center mb-3 md:mb-4">
                   <div className="w-12 h-12 md:w-16 md:h-16">
                     {/* SVG Icon */}
-                     <svg className="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M50 10L90 30V70L50 90L10 70V30L50 10Z" stroke="#00D8FF" strokeWidth="2" fill="none" />
                       <path d="M30 40L50 30L70 40V60L50 70L30 60V40Z" stroke="#00D8FF" strokeWidth="2" fill="none" />
                       <path d="M10 30L50 10L90 30" stroke="#00D8FF" strokeWidth="2" />
