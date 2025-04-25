@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-// Import searchCryptocurrencies from our cryptoService
 import { 
   fetchTopCoins, 
   fetchTrendingCoins,
@@ -15,8 +14,8 @@ import {
   type CoinData,
   type TrendingCoin
 } from '@/services/cryptoService';
-import { useMediaQuery } from 'react-responsive'; // Import useMediaQuery
-import FogBackground from './FogBackground'; // Import our new FogBackground component
+import { useMediaQuery } from 'react-responsive'; 
+import FogBackground from './FogBackground'; 
 
 const ParallaxScene = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -25,31 +24,26 @@ const ParallaxScene = () => {
   const [displayedCoins, setDisplayedCoins] = useState<CoinData[]>([]);
   const [trendingCoins, setTrendingCoins] = useState<TrendingCoin[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  // Track the selected cryptocurrency
   const [selectedCoin, setSelectedCoin] = useState<CoinData | null>(null);
   const [selectedCoinDetails, setSelectedCoinDetails] = useState<CoinData | null>(null);
-  // Search functionality
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<CoinData[]>([]);
-  const isMobile = useMediaQuery({ query: '(max-width: 768px)' }); // Add media query hook
+  const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
 
-  // Fetch cryptocurrency data
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
         const [topCoinsData, trendingCoinsData] = await Promise.all([
-          // Use the directly imported functions, now fetching more coins for search functionality
           fetchTopCoins('usd', 20),
           fetchTrendingCoins()
         ]);
         
         setTopCoins(topCoinsData);
-        setDisplayedCoins(topCoinsData.slice(0, 5)); // Show only top 5
+        setDisplayedCoins(topCoinsData.slice(0, 5)); 
         setTrendingCoins(trendingCoinsData);
         
-        // Default selected coin is the first one
         if (topCoinsData.length > 0 && !selectedCoin) {
           setSelectedCoin(topCoinsData[0]);
         }
@@ -62,12 +56,10 @@ const ParallaxScene = () => {
 
     fetchData();
     
-    // Refresh data every 60 seconds
     const intervalId = setInterval(fetchData, 60000);
     return () => clearInterval(intervalId);
   }, [selectedCoin]);
 
-  // Fetch detailed data for the selected coin
   useEffect(() => {
     if (!selectedCoin) return;
     
@@ -85,10 +77,8 @@ const ParallaxScene = () => {
     fetchSelectedCoinDetails();
   }, [selectedCoin]);
   
-  // Handle search functionality
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
-      // If search query is empty, reset to top coins
       setDisplayedCoins(topCoins.slice(0, 5));
       setIsSearching(false);
       return;
@@ -98,14 +88,11 @@ const ParallaxScene = () => {
     try {
       const results = await searchCryptocurrencies(searchQuery);
       
-      // Convert search results to CoinData format if needed
       const searchedCoins = await Promise.all(
         results.slice(0, 5).map(async (item) => {
-          // Check if we already have this coin in our topCoins array
           const existingCoin = topCoins.find(coin => coin.id === item.id);
           if (existingCoin) return existingCoin;
           
-          // Otherwise fetch the full data for this coin
           const coinData = await fetchCoinData(item.id);
           return coinData || {
             id: item.id,
@@ -121,11 +108,9 @@ const ParallaxScene = () => {
         })
       );
       
-      // Filter out any null results
       const validResults = searchedCoins.filter(coin => coin !== null) as CoinData[];
       setDisplayedCoins(validResults);
       
-      // If we got results and there's no selected coin, select the first result
       if (validResults.length > 0 && (!selectedCoin || !validResults.find(coin => coin.id === selectedCoin.id))) {
         setSelectedCoin(validResults[0]);
       }
@@ -136,7 +121,6 @@ const ParallaxScene = () => {
     }
   };
 
-  // Mouse movement handler
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!containerRef.current) return;
@@ -160,7 +144,6 @@ const ParallaxScene = () => {
     };
   }, []);
 
-  // Handle coin selection
   const handleSelectCoin = (coin: CoinData) => {
     setSelectedCoin(coin);
   };
@@ -168,10 +151,8 @@ const ParallaxScene = () => {
   return (
     <div
       ref={containerRef}
-      // Conditionally apply overflow-y based on isMobile
       className={cn(
         "relative w-screen bg-[#141529]",
-        // For mobile: make it a normal scrolling page with full padding
         isMobile 
           ? "min-h-screen overflow-y-auto overflow-x-hidden px-4 pb-16" 
           : "h-screen overflow-y-hidden overflow-x-hidden"
@@ -180,9 +161,8 @@ const ParallaxScene = () => {
       {/* LAYER 1: Background elements */}
       <div className={cn(
         "absolute inset-0 z-0",
-        isMobile ? "h-[200vh]" : "" // Make background taller on mobile for scrolling
+        isMobile ? "h-[200vh]" : ""
       )}>
-        {/* ThreeJS Fog Background */}
         <FogBackground 
           color="#141529" 
           near={1.5} 
@@ -199,7 +179,7 @@ const ParallaxScene = () => {
         
         {/* Grid overlay - medium-slow movement */}
         <div 
-          className="absolute inset-0 bg-[url('/src/images/background.png')] opacity-15"
+          className="absolute inset-0 bg-[url('/images/background.png')] opacity-15"
           style={{
             backgroundSize: '100%',
             backgroundRepeat: 'repeat',
@@ -217,7 +197,6 @@ const ParallaxScene = () => {
               <div className="w-full h-full rounded-full overflow-hidden border-2 border-blue-400/30 shadow-lg shadow-blue-500/20 animate-pulse-slow">
                 <img src={selectedCoin.image} alt={selectedCoin.name} className="w-full h-full object-cover" />
               </div>
-              {/* Keep the style tag as it defines the animation */}
               <style>
                 {`
                   @keyframes pulse-slow {
@@ -292,7 +271,7 @@ const ParallaxScene = () => {
               {/* GOD'S text */}
               <div className="relative">
                 <img
-                  src="/src/images/gods.png"
+                  src="/images/gods.png"
                   alt="GOD'S"
                   className="w-full h-auto max-w-full"
                 />
@@ -301,7 +280,7 @@ const ParallaxScene = () => {
               {/* DOLLAR text */}
               <div className="relative -mt-4">
                 <img
-                  src="/src/images/dollar-text.png"
+                  src="/images/dollar-text.png"
                   alt="DOLLAR"
                   className="w-full h-auto max-w-full"
                 />
@@ -393,7 +372,6 @@ const ParallaxScene = () => {
                             alt={coin.name} 
                             className="w-5 h-5 object-contain" 
                             onError={(e) => {
-                              // Fallback to first letter of symbol
                               (e.target as HTMLImageElement).style.display = 'none';
                               const parent = (e.target as HTMLImageElement).parentElement;
                               if (parent) {
@@ -434,17 +412,14 @@ const ParallaxScene = () => {
                 <div className="w-full h-32 rounded-xl bg-gray-700/50 animate-pulse mb-2"></div>
               ) : selectedCoin ? (
                 <div className="w-full mb-2">
-                  {/* Simple price range visualization */}
                   <div className="flex justify-between items-center text-xs text-gray-300 mb-2 px-3">
                     <div>Low: {formatPrice(selectedCoin.low_24h || selectedCoin.current_price * 0.9)}</div>
                     <div>High: {formatPrice(selectedCoin.high_24h || selectedCoin.current_price * 1.1)}</div>
                   </div>
                   
                   <div className="relative h-8 bg-gray-700/30 rounded-lg overflow-hidden mb-4">
-                    {/* Low price marker */}
                     <div className="absolute bottom-0 left-0 h-full w-1 bg-red-500"></div>
                     
-                    {/* Current price marker */}
                     <div 
                       className="absolute bottom-0 h-full w-1 bg-white"
                       style={{ 
@@ -455,10 +430,8 @@ const ParallaxScene = () => {
                       }}
                     ></div>
                     
-                    {/* High price marker */}
                     <div className="absolute bottom-0 right-0 h-full w-1 bg-green-500"></div>
                     
-                    {/* Gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 via-purple-500/20 to-green-500/20"></div>
                   </div>
                   
@@ -637,7 +610,7 @@ const ParallaxScene = () => {
           {/* Main central figure placed at the bottom for mobile */} 
           <div className="w-full max-w-[500px] mx-auto mb-12">
             <img
-              src="/src/images/main.png"
+              src="/images/main.png"
               alt="God Dollar Figure"
               className="w-full h-auto object-contain brightness-125 contrast-125"
             />
@@ -658,7 +631,7 @@ const ParallaxScene = () => {
               }}
             >
               <img
-                src="/src/images/main.png"
+                src="/images/main.png"
                 alt="God Dollar Figure"
                 className="w-full h-auto object-contain brightness-125 contrast-125 max-w-[1200px]"
               />
@@ -681,7 +654,6 @@ const ParallaxScene = () => {
                 <div className="w-full h-full rounded-full overflow-hidden border-2 border-blue-400/30 shadow-lg shadow-blue-500/20 animate-pulse-slow">
                   <img src={selectedCoin.image} alt={selectedCoin.name} className="w-full h-full object-cover" />
                 </div>
-                {/* Keep the style tag as it defines the animation */}
                 <style>
                   {`
                     @keyframes pulse-slow {
@@ -788,7 +760,6 @@ const ParallaxScene = () => {
                 <div className="max-h-[150px] md:max-h-[190px] overflow-y-auto custom-scrollbar pb-1">
                   {isLoading || isSearching ? (
                     <div className="animate-pulse space-y-2 md:space-y-3 px-1">
-                      {/* Adjust skeleton height/spacing */}
                       <div className="h-6 md:h-8 bg-[#131136] w-full"></div>
                       <div className="h-6 md:h-8 bg-[#131136] w-full"></div>
                       <div className="h-6 md:h-8 bg-[#131136] w-full"></div>
@@ -810,7 +781,6 @@ const ParallaxScene = () => {
                               alt={coin.name} 
                               className="w-4 h-4 md:w-5 md:h-5 object-contain" 
                               onError={(e) => {
-                                // Fallback to first letter of symbol
                                 (e.target as HTMLImageElement).style.display = 'none';
                                 const parent = (e.target as HTMLImageElement).parentElement;
                                 if (parent) {
@@ -850,24 +820,20 @@ const ParallaxScene = () => {
                 transform: `translate(${mousePosition.x * 40}px, ${mousePosition.y * 40}px)`,
               }}
             >
-              {/* Card content remains the same, maybe adjust padding/text size */}
               <div className="bg-[#1E1A45]/60 border border-blue-500/20 backdrop-blur-md p-4 md:p-5 rounded-xl overflow-hidden shadow-lg transition-transform hover:scale-105 w-full">
                 <h3 className="text-blue-300 text-lg md:text-xl font-medium mb-3 md:mb-4">Price Range (24h)</h3>
                 {isLoading ? (
                   <div className="w-full h-24 md:h-32 rounded-xl bg-gray-700/50 animate-pulse mb-2"></div>
                 ) : selectedCoin ? (
                   <div className="w-full mb-2">
-                    {/* Simple price range visualization */}
                     <div className="flex justify-between items-center text-[10px] md:text-xs text-gray-300 mb-2 px-1 md:px-3">
                       <div>Low: {formatPrice(selectedCoin.low_24h || selectedCoin.current_price * 0.9)}</div>
                       <div>High: {formatPrice(selectedCoin.high_24h || selectedCoin.current_price * 1.1)}</div>
                     </div>
                     
                     <div className="relative h-6 md:h-8 bg-gray-700/30 rounded-lg overflow-hidden mb-3 md:mb-4">
-                      {/* Low price marker */}
                       <div className="absolute bottom-0 left-0 h-full w-1 bg-red-500"></div>
                       
-                      {/* Current price marker */}
                       <div 
                         className="absolute bottom-0 h-full w-1 bg-white"
                         style={{ 
@@ -878,10 +844,8 @@ const ParallaxScene = () => {
                         }}
                       ></div>
                       
-                      {/* High price marker */}
                       <div className="absolute bottom-0 right-0 h-full w-1 bg-green-500"></div>
                       
-                      {/* Gradient overlay */}
                       <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 via-purple-500/20 to-green-500/20"></div>
                     </div>
                     
@@ -919,7 +883,6 @@ const ParallaxScene = () => {
                 transform: `translate(${mousePosition.x * 35}px, ${mousePosition.y * 35}px)`,
               }}
             >
-              {/* Card content remains the same, maybe adjust padding/text size */}
               <div className="bg-[#1E1A45]/60 border border-blue-500/20 backdrop-blur-md p-4 md:p-5 rounded-xl shadow-lg transition-transform hover:scale-105 w-full">
                 <div className="flex items-center justify-center mb-3 md:mb-4">
                   <div className="w-12 h-12 md:w-16 md:h-16">
@@ -1030,20 +993,6 @@ const ParallaxScene = () => {
                       </svg>
                     </div>
                   </a>
-                  
-                  {/* Telegram */}
-                  <a 
-                    href="https://t.me/godsdollar" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex flex-col items-center justify-center transition-transform hover:scale-110"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center shadow-lg">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-                      </svg>
-                    </div>
-                  </a>
                 </div>
               </div>
             </div>
@@ -1058,7 +1007,7 @@ const ParallaxScene = () => {
                 }}
               >
                 <img
-                  src="/src/images/gods.png"
+                  src="/images/gods.png"
                   alt="GOD'S"
                   className="w-full h-auto max-w-[500px]" 
                 />
@@ -1072,7 +1021,7 @@ const ParallaxScene = () => {
                 }}
               >
                 <img
-                  src="/src/images/dollar-text.png"
+                  src="/images/dollar-text.png"
                   alt="DOLLAR"
                   className="w-full h-auto max-w-[500px]"
                 />
@@ -1124,27 +1073,3 @@ const ParallaxScene = () => {
 };
 
 export default ParallaxScene;
-
-// Helper hook (can be moved to a separate file like hooks/useMediaQuery.ts)
-// import { useState, useEffect } from 'react';
-
-// const useMediaQuery = (query: string): boolean => {
-//   const [matches, setMatches] = useState(false);
-
-//   useEffect(() => {
-//     const media = window.matchMedia(query);
-//     if (media.matches !== matches) {
-//       setMatches(media.matches);
-//     }
-//     const listener = () => setMatches(media.matches);
-//     window.addEventListener('resize', listener);
-//     return () => window.removeEventListener('resize', listener);
-//   }, [matches, query]);
-
-//   return matches;
-// };
-
-// Note: If you already have a useMediaQuery hook or similar logic (like use-mobile.tsx), 
-// ensure it's imported correctly and used instead of redefining it here.
-// I also added react-responsive as a potential dependency if you don't have a hook.
-// You might need to install it: bun add react-responsive

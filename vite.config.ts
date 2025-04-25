@@ -5,7 +5,7 @@ import path from "path";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: "./",  // Use relative paths
+  base: "/godsdollar/",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -19,8 +19,8 @@ export default defineConfig({
         format: 'es',
         manualChunks: undefined,
         assetFileNames: (assetInfo) => {
-          const info = assetInfo.name.split(".");
-          const extType = info[info.length - 1];
+          if (!assetInfo.name) return 'assets/[name]-[hash][extname]';
+          
           if (/\.(png|jpe?g|svg|gif|tiff|bmp|ico)$/i.test(assetInfo.name)) {
             return `assets/images/[name]-[hash][extname]`;
           }
