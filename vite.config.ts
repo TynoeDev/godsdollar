@@ -16,6 +16,7 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       output: {
+        format: 'es',
         manualChunks: undefined,
         assetFileNames: (assetInfo) => {
           const info = assetInfo.name.split(".");
