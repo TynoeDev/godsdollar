@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+  <script>
+    // Get the current path and redirect to the same path on the main app
+    const path = window.location.pathname.replace('/godsdollar/', '/');
+    const redirectPath = '/godsdollar' + (path === '/' ? '' : path);
+    window.location.replace(redirectPath);
+  </script>
+</head>
+<body>
+  Redirecting...
+</body>
+</html>
